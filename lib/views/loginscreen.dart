@@ -129,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textStyle: const TextStyle(fontSize: 20),
                         ),
                         onPressed: _registerUser,
-                        child: const Text('Register'),
+                        child: const Text('Havent register? Register Now'),
                       ),
                     ],
                   ),
