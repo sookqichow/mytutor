@@ -62,6 +62,9 @@ class _TabsSubjectsState extends State<TabsSubjects> {
             
             children: [
               
+              Padding(
+                padding: EdgeInsets.all(2),
+              ),
               Expanded(
                   child: GridView.count(
                       crossAxisCount: 2,
@@ -77,7 +80,7 @@ class _TabsSubjectsState extends State<TabsSubjects> {
                                 flex: 5,
                                 child: CachedNetworkImage(
                                   imageUrl: CONSTANTS.server +
-                                      "/mytutor/assets/images/courses/" + //xampp htdocs
+                                      "/mytutor/assets/images/courses/" +
                                       subList[index].subjectId.toString() +
                                       '.png',
                                   fit: BoxFit.cover,
@@ -94,6 +97,9 @@ class _TabsSubjectsState extends State<TabsSubjects> {
                                     children: [
                                       Text(
                                         subList[index].subjectName.toString(),
+                                        overflow: TextOverflow.fade,
+                                          maxLines: 1,
+                                          softWrap: false,
                                         style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold),

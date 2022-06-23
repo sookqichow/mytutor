@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mytutor/constants.dart';
 
 import 'package:mytutor/models/user.dart';
@@ -28,7 +27,7 @@ class _TabsTutorsState extends State<TabsTutors> {
   @override
   void initState() {
     super.initState();
-    _loadTutors(1,search);
+    _loadTutors(1, search);
   }
 
   @override
@@ -60,7 +59,7 @@ class _TabsTutorsState extends State<TabsTutors> {
                       fontSize: 22, fontWeight: FontWeight.bold)))
           : Column(children: [
               Padding(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(2),
               ),
               Expanded(
                   child: GridView.count(
@@ -79,7 +78,7 @@ class _TabsTutorsState extends State<TabsTutors> {
                                   flex: 6,
                                   child: CachedNetworkImage(
                                     imageUrl: CONSTANTS.server +
-                                        "/assets/images/tutors/" + //xampp htdocs
+                                        "/mytutor/assets/images/tutors/" + //xampp htdocs
                                         tutorsList[index].tutorId.toString() +
                                         '.jpg',
                                     fit: BoxFit.cover,
@@ -98,10 +97,13 @@ class _TabsTutorsState extends State<TabsTutors> {
                                           tutorsList[index]
                                               .tutorName
                                               .toString(),
-                                              overflow: TextOverflow.ellipsis,
+                                          overflow: TextOverflow.fade,
+                                          maxLines: 1,
+                                          softWrap: false,
                                           style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                         Text("Phone:" +
                                             tutorsList[index]
@@ -133,7 +135,7 @@ class _TabsTutorsState extends State<TabsTutors> {
                     return SizedBox(
                       width: 40,
                       child: TextButton(
-                          onPressed: () => {_loadTutors(index + 1,"")},
+                          onPressed: () => {_loadTutors(index + 1, "")},
                           child: Text(
                             (index + 1).toString(),
                             style: TextStyle(color: color),
@@ -200,7 +202,7 @@ class _TabsTutorsState extends State<TabsTutors> {
               children: [
                 CachedNetworkImage(
                   imageUrl: CONSTANTS.server +
-                      "/mytutor/assets/images/courses/" +
+                      "/mytutor/assets/images/tutors/" +
                       tutorsList[index].tutorId.toString() +
                       '.jpg',
                   fit: BoxFit.cover,
@@ -215,19 +217,12 @@ class _TabsTutorsState extends State<TabsTutors> {
                       fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  
-                   Text("Phone no: " +
-                      tutorsList[index].tutorPhone.toString()),
-                   Text("Email: " +
-                      tutorsList[index].tutorEmail.toString()),
+                  Text("Phone no: " + tutorsList[index].tutorPhone.toString()),
+                  Text("Email: " + tutorsList[index].tutorEmail.toString()),
                   Text("Tutor Description: \n" +
                       tutorsList[index].tutorDesc.toString()),
-                 
                   Text("Date register: " +
-                  
-                      tutorsList[index].tutorDatereg.toString() 
-                      ),
-                  
+                      tutorsList[index].tutorDatereg.toString()),
                 ]),
               ],
             )),
@@ -243,6 +238,7 @@ class _TabsTutorsState extends State<TabsTutors> {
           );
         });
   }
+
   void _loadSearchDialog() {
     searchController.text = "";
     showDialog(
