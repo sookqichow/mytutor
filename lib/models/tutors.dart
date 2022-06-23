@@ -1,4 +1,4 @@
-class listTutors{
+class ListTutors{
  String? tutorId;
  String?  tutorEmail;
  String?  tutorPhone;
@@ -7,7 +7,7 @@ class listTutors{
   String? tutorDesc;
   String?  tutorDatereg;
 
- listTutors(
+ ListTutors(
       {this. tutorId,
       this. tutorEmail,
       this. tutorPhone,
@@ -17,7 +17,7 @@ class listTutors{
       this. tutorDatereg
       });
 
-  listTutors.fromJson(Map<String, dynamic> json) {
+  ListTutors.fromJson(Map<String, dynamic> json) {
    tutorId = json['tutor_id'];
     tutorEmail = json['tutor_email'];
     tutorPhone = json['tutor_phone'];

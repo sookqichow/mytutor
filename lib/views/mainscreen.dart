@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:/mytutor/views/TabsSubject.dart';
-import 'package:/mytutor/views/TabsTutors.dart';
 import 'package:mytutor/views/tabsSubject.dart';
+import 'package:mytutor/views/tabsTutors.dart';
 import '../models/user.dart';
 
 class MainScreen extends StatefulWidget {
@@ -47,9 +46,7 @@ class _MainScreenState extends State<MainScreen> {
       resWidth = screenWidth * 0.75;
       //rowcount = 3;
     }return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Tutor'),
-      ),
+      
      body: tabs[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -76,6 +73,8 @@ class _MainScreenState extends State<MainScreen> {
             label: "Profile",
           )
         ],
+         onTap: onTapped,
+        currentIndex: _selectedIndex,
       ),
     );
   }
