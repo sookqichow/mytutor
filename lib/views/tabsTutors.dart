@@ -43,7 +43,9 @@ class _TabsTutorsState extends State<TabsTutors> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tutors'), actions: [
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text('Tutors'), actions: [
         IconButton(
           icon: const Icon(Icons.search),
           onPressed: () {

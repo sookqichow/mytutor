@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mytutor/constants.dart';
 import 'package:mytutor/models/user.dart';
 import 'package:mytutor/models/subjects.dart';
+import 'package:mytutor/views/cartscreen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class TabsSubjects extends StatefulWidget {
-  late final User user;
+  final User user;
+  const TabsSubjects({Key? key, required this.user}) : super(key: key);
 
   @override
   State<TabsSubjects> createState() => _TabsSubjectsState();
@@ -22,11 +25,14 @@ class _TabsSubjectsState extends State<TabsSubjects> {
   late double screenHeight, screenWidth, resWidth;
   var numofpage, curpage = 1;
   var color;
+  int cart = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadSubjects(1, search);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _loadSubjects(1, search);
+    });
   }
 
   @override
@@ -42,26 +48,43 @@ class _TabsSubjectsState extends State<TabsSubjects> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Subjects'), actions: [
-        IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () {
-            _loadSearchDialog();
-          },
-        ),
-      ]),
+      appBar: AppBar(
+          centerTitle: true,
+          title: const Text('Subjects'),
+          leading: IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              _loadSearchDialog();
+            },
+          ),
+          actions: [
+            TextButton.icon(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (content) => CartScreen(
+                              user: widget.user,
+                            )));
+                _loadSubjects(1, search);
+                _loadMyCart();
+              },
+              icon: const Icon(
+                Icons.shopping_cart,
+                color: Colors.black,
+              ),
+              label: Text(widget.user.cart.toString(),
+                  style: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold)),
+            ),
+          ]),
       backgroundColor: Colors.amber[100],
       body: subList.isEmpty
           ? Center(
               child: Text(titlecenter,
                   style: const TextStyle(
                       fontSize: 22, fontWeight: FontWeight.bold)))
-          :
-          
-          Column(
-            
-            children: [
-              
+          : Column(children: [
               Padding(
                 padding: EdgeInsets.all(2),
               ),
@@ -98,8 +121,8 @@ class _TabsSubjectsState extends State<TabsSubjects> {
                                       Text(
                                         subList[index].subjectName.toString(),
                                         overflow: TextOverflow.fade,
-                                          maxLines: 1,
-                                          softWrap: false,
+                                        maxLines: 1,
+                                        softWrap: false,
                                         style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold),
@@ -112,15 +135,25 @@ class _TabsSubjectsState extends State<TabsSubjects> {
                                       /* Text(subjectList[index]
                                               .subjectDesc
                                               .toString() ),*/
-                                      Text("Sessions: " +subList[index]
+                                      Text("Sessions: " +
+                                          subList[index]
                                               .subjectSessions
                                               .toString() +
                                           " Sessions"),
-                                      Text("Rating: " +subList[index]
-                                          .subjectRating
-                                          .toString()+ " stars"),
+                                      Text("Rating: " +
+                                          subList[index]
+                                              .subjectRating
+                                              .toString() +
+                                          " stars"),
                                     ],
-                                  ))
+                                  )),
+                              Expanded(
+                                  flex: 3,
+                                  child: IconButton(
+                                      onPressed: () {
+                                        _addtocartDialog(index);
+                                      },
+                                      icon: const Icon(Icons.shopping_cart))),
                             ],
                           )),
                         );
@@ -231,19 +264,20 @@ class _TabsSubjectsState extends State<TabsSubjects> {
                       subList[index].subjectSessions.toString() +
                       " sessions"),
                   Text("Subject Rating: " +
-                      subList[index].subjectRating.toString()+" stars"),
+                      subList[index].subjectRating.toString() +
+                      " stars"),
                 ]),
               ],
             )),
-            // actions: [
-            //   SizedBox(
-            //       width: screenWidth / 1,
-            //       child: ElevatedButton(
-            //           onPressed: () {
-            //             _addtocartDialog(index);
-            //           },
-            //           child: const Text("Add to cart"))),
-            // ],
+            actions: [
+              SizedBox(
+                  width: screenWidth / 1,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        _addtocartDialog(index);
+                      },
+                      child: const Text("Add to cart"))),
+            ],
           );
         });
   }
@@ -316,5 +350,95 @@ class _TabsSubjectsState extends State<TabsSubjects> {
             },
           );
         });
+  }
+
+  _addtocartDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: const Text(
+            "Add to cart",
+            style: TextStyle(),
+          ),
+          content: const Text("Are you sure?", style: TextStyle()),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                "Yes",
+                style: TextStyle(),
+              ),
+              onPressed: () async {
+                _addtoCart(index);
+              },
+            ),
+            TextButton(
+              child: const Text(
+                "No",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _loadMyCart() {
+    // ignore: avoid_single_cascade_in_expression_statements
+    http.post(
+        Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/load_mycartqty.php"),
+        body: {
+          "user_email": widget.user.email.toString(),
+        }).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        return http.Response(
+            'Error', 408); // Request Timeout response status code
+      },
+    ).then((response) {
+      var jsondata = jsonDecode(response.body);
+      if (response.statusCode == 200 && jsondata['status'] == 'success') {
+        print(jsondata['data']['carttotal'].toString());
+        setState(() {
+          widget.user.cart = jsondata['data']['carttotal'].toString();
+        });
+      }
+    });
+  }
+
+  void _addtoCart(int index) {
+    http.post(
+        Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/insert_cart.php"),
+        body: {
+          "user_email": widget.user.email.toString(),
+          "subject_id": subList[index].subjectId.toString(),
+        }).timeout(
+      const Duration(seconds: 5),
+      onTimeout: () {
+        return http.Response(
+            'Error', 408); 
+      },
+    ).then((response) {
+      print(response.body);
+      var jsondata = jsonDecode(response.body);
+      if (response.statusCode == 200 && jsondata['status'] == 'success') {
+        print(jsondata['data']['carttotal'].toString());
+        setState(() {
+          widget.user.cart = jsondata['data']['carttotal'].toString();
+        });
+        Fluttertoast.showToast(
+            msg: "Success",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+      }
+    });
   }
 }

@@ -22,7 +22,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     tabs = [
-     TabsSubjects(),
+     TabsSubjects(user:widget.user),
       TabsTutors(),
       // TabsTutors(),
       // TabsTutors(),
